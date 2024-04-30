@@ -1,6 +1,6 @@
 import { Product } from "@prisma/client";
 
-export const calculateProductPrice = (product: Product): Number => {
+export const calculateProductPrice = (product: Product): number => {
   if (product.discountPercentage === 0) {
     return Number(product.price);
   }
@@ -10,7 +10,7 @@ export const calculateProductPrice = (product: Product): Number => {
   return Number(product.price) - discount;
 };
 
-export const formatCurrency = (value: Number) => {
+export const formatCurrency = (value: number) => {
   return `R$${Intl.NumberFormat("pt-br", {
     currency: "BRL",
     minimumFractionDigits: 2,
