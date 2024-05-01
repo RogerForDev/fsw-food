@@ -123,13 +123,18 @@ const ProductDetails = ({
           </div>
         </Card>
       </div>
+
       <div className="mt-6 space-y-3 px-5">
         <h3 className="font-semibold">Sobre</h3>
         <p className="text-sm text-muted-foreground">{product?.description}</p>
       </div>
+
       <div className="mt-6 space-y-3">
         <h3 className="px-5 font-semibold">Sucos</h3>
         <ProductsList products={complementaryProducts} />
+      </div>
+      <div className="mt-6 px-5">
+        <Button className="w-full font-semibold">Adicionar ao carrinho</Button>
       </div>
     </div>
   );
