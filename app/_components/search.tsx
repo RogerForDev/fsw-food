@@ -14,7 +14,9 @@ const Search = () => {
     setSearch(e.target.value);
   };
 
-  const handleSearchSubmit = (e: React.FormEventHandler<HTMLFormElement>) => {
+  const handleSearchSubmit = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
     e.preventDefault();
     if (!search) {
       return;
