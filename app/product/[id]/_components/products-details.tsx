@@ -4,6 +4,10 @@ import Cart from "@/app/_components/cart";
 import DeliveryInfo from "@/app/_components/delivery-info";
 import DiscountBadge from "@/app/_components/discount-badge";
 import ProductsList from "@/app/_components/products-list";
+import {
+  AlertDialogHeader,
+  AlertDialogFooter,
+} from "@/app/_components/ui/alert-dialog";
 import { Button } from "@/app/_components/ui/button";
 import {
   Sheet,
@@ -14,6 +18,14 @@ import {
 import { CartContext } from "@/app/_context/cart";
 import { formatCurrency, calculateProductPrice } from "@/app/_helpers/price";
 import { Prisma } from "@prisma/client";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@radix-ui/react-alert-dialog";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useContext } from "react";
@@ -37,13 +49,29 @@ const ProductDetails = ({
 }: ProductDetailsProps) => {
   const [quantity, setQuantity] = React.useState(1);
   const [isCartOpen, setIsCartOpen] = React.useState(false);
+  const [isConfirmationDialogOpen, setConfirmationDialogOpen] =
+    React.useState(false);
   const { addProductToCart, products } = useContext(CartContext);
 
   console.log(products);
 
-  const handleAddToCartClick = () => {
-    addProductToCart(product, quantity);
+  const addToCart = ({ emptyCart }: { emptyCart?: boolean }) => {
+    addProductToCart({ product, quantity, emptyCart });
     setIsCartOpen(true);
+  };
+
+  const handleAddToCartClick = () => {
+    // verificar se há alum produto de outro restaurante no carrinho
+    const hasdifferentRestaurantProducts = products.some(
+      (cartProduct) => cartProduct.restaurantId !== product?.restaurantId,
+    );
+
+    // SE HOUVER, ABRIR UM AVISO
+
+    if (hasdifferentRestaurantProducts) {
+      return setConfirmationDialogOpen(true);
+    }
+    addToCart({ emptyCart: false });
   };
 
   const handleIncreaseQuantityClick = () =>
@@ -137,11 +165,35 @@ const ProductDetails = ({
       <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
         <SheetContent className="w-[90vw]">
           <SheetHeader>
-            <SheetTitle className="text-left font-semibold">Sacola</SheetTitle>
+            <SheetTitle className="text-left text-xl font-semibold text-primary">
+              Sacola
+            </SheetTitle>
           </SheetHeader>
           <Cart />
         </SheetContent>
       </Sheet>
+      <AlertDialog
+        open={isConfirmationDialogOpen}
+        onOpenChange={setConfirmationDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Você só pode adicionar itens de um restaurante por vez
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Deseja mesmo adicionar esse produto? Isso limpará a sua sacola
+              atual.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => addToCart({ emptyCart: true })}>
+              Esvaziar sacola e adicionar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
